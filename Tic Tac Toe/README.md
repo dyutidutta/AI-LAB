@@ -3,7 +3,7 @@
 ## Practical :- Tic-Tac-Toe with and without Magic Square Logic
 ---
 
-### Problem Statement
+### ● Problem Statement
 Tic-Tac-Toe is a two-player game played on a 3×3 grid. The players alternate placing marks (X or O) in empty cells, and the first to align three marks horizontally, vertically, or diagonally wins. 
 Here, we present:
 - **Normal Approach** – Win is detected by matching the player's value across a row, column, or diagonal.
@@ -12,7 +12,7 @@ Both versions allow a **human player (O)** to play against the **computer (X)**.
 
 ---
 
-### Data Structures Used
+### ● Data Structures Used
 
 | Component          | Data Structure        | Purpose |
 |--------------------|-----------------------|---------|
@@ -22,7 +22,7 @@ Both versions allow a **human player (O)** to play against the **computer (X)**.
 
 ---
 
-### Utility Functions
+### ● Utility Functions
 
 | Function Name       | Purpose |
 |---------------------|---------|
@@ -36,7 +36,7 @@ Both versions allow a **human player (O)** to play against the **computer (X)**.
 	
 ---
 
-### Algorithms
+### ● Algorithms
 
 #### 1. Normal Version
 - **Idea:** Represent X as `3` and O as `5`.
@@ -74,7 +74,7 @@ function Posswin(player):
 
 ---
 
-### Game Flow (Both Versions)
+### ● Game Flow (Both Versions)
 1. Computer (X) starts first.
 2. Moves are chosen based on:
    - Try to win.
@@ -88,7 +88,7 @@ function Posswin(player):
 
 ---
 
-### Sample Gameplay (Computer X Wins)
+### ● Sample Gameplay (Computer X Wins)
 
 ```
 You are O, computer is X.
@@ -132,7 +132,7 @@ Computer (X) wins!
 
 ---
 
-### Time and Space Complexities
+### ● Time and Space Complexities
 Both versions have **O(1)** time and **O(1)** space complexity since the board size is fixed (3×3).
 
 | Method        | Time Complexity | Space Complexity |
@@ -148,7 +148,7 @@ Both versions have **O(1)** time and **O(1)** space complexity since the board s
 **Beginner Game Programming:** Introduces board representation, user input handling, and AI strategy.
 
 ---
-### Files
+### ● Files
 | Filename              | Description |
 |-----------------------|-------------|
 | `tictactoe.cpp`       | Contains Normal Tic-Tac-Toe implementation. |
