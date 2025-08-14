@@ -123,7 +123,6 @@ Goal reached.
 | Operation | Time Complexity | Space Complexity |
 |-----------|----------------|------------------|
 | GCD Calculation | O(log min(X, Y)) | O(1) |
-| Simulation Loop | O(steps) – bounded by constant (few operations) | O(1) |
 | **Overall** | O(1) for fixed-size jugs | O(1) |
 
 ---
