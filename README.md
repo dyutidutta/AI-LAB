@@ -1,37 +1,34 @@
 <h1 align="center">Artificial Intelligence</h1>
 
-## Practical :- 8-Puzzle Problem using BFS and DFS in C++
+## Practical :- 8-Puzzle Problem using BFS, DFS, and Best-First Search in C++
 
 ### ● Problem Statement
 
 The **8-Puzzle Problem** is a classic problem in artificial intelligence and graph theory. It consists of a 3x3 grid with tiles numbered 1-8 and one empty space (represented as `0`). The goal is to move the tiles into the correct position by sliding them one at a time into the empty space, ultimately reaching a predefined goal state.
 
-
 ---
 
 ### ● Data Structures Used
 
-| Component         | Data Structure            | Purpose                                          |
-|-------------------|---------------------------|--------------------------------------------------|
-| Puzzle State      | `vector<vector<int>>`     | 3x3 matrix to represent the puzzle.              |
-| Visited Set       | `unordered_set<string>`   | Stores string representations of visited states. |
-| Frontier (BFS)    | `queue<Matrix>`           | Stores states to explore next in BFS.            |
-| Frontier (DFS)    | `stack<Matrix>`           | Stores states to explore next in DFS.            |
-| State Generation  | `list<Matrix>`            | Stores all valid next states.                    |
+| Component         | Data Structure / Type                   | Purpose                                                                  |
+|-------------------|-----------------------------------------|--------------------------------------------------------------------------|
+| Puzzle State      | `vector<vector<int>>`                   | 3x3 matrix to represent the puzzle.                                      |
+| Visited Set       | `unordered_set<string>`                 | Stores string representations of visited states.                         |
+| Frontier (BFS)    | `queue<Matrix>`                         | Stores states to explore next in BFS.                                    |
+| Frontier (DFS)    | `stack<Matrix>`                         | Stores states to explore next in DFS.                                    |
+| Frontier (BestFS) | `priority_queue<Node>`                  | Stores states prioritized by heuristic.                                  |
+| State Generation  | `list<Matrix>`                          | Stores all valid next states.                                            |
+| Node Structure    | `struct Node { Matrix state; int h; };` | A puzzle state & its heuristic value `h` for ordering in priority queue. |
 
 ---
 
-## ● Algorithm: Breadth-First Search (BFS)
+## ● Algorithms: 
+### Common Helper Functions:
 
-### **Input**
-- `Matrix prob` → Initial puzzle configuration  
-- `Matrix sol` → Goal puzzle configuration  
+These two functions are used in **BFS**, **DFS**, and **Best-First Search**.
 
-### **Output**
-- `"Success!"` if goal state is found  
-- `"Failed!"` if no solution exists  
-
-### **Pseudocode**
+**1. State Generation (`genmove`)**  
+Generates all possible valid moves from the current puzzle state.
 ```
 FUNCTION genmove(state):
     nextStates ← empty list
@@ -60,6 +57,9 @@ FUNCTION genmove(state):
     RETURN nextStates
 ```
 
+**2. Matrix to String Conversion (`matrixToString`)**  
+Converts a puzzle state into a single string for easy storage in visited sets.
+
 ```
 FUNCTION matrixToString(mat):
     s ← empty string
@@ -68,6 +68,18 @@ FUNCTION matrixToString(mat):
             append value to s as a string
     RETURN s
 ```
+
+### Breadth-First Search (BFS)
+
+#### **Input**
+- `Matrix prob` → Initial puzzle configuration  
+- `Matrix sol` → Goal puzzle configuration  
+
+#### **Output**
+- `"Success!"` if goal state is found  
+- `"Failed!"` if no solution exists  
+
+#### **Pseudocode**
 
 ```
 FUNCTION bfs(prob, sol):
@@ -94,32 +106,19 @@ FUNCTION bfs(prob, sol):
     PRINT "Failed!"
 ```
 
-```
-MAIN:
-    prob ← [[1, 2, 3],
-            [4, 0, 6],
-            [7, 5, 8]]
-
-    sol  ← [[1, 2, 3],
-            [4, 5, 6],
-            [7, 8, 0]]
-
-    CALL bfs(prob, sol)
-```
-
 ---
 
-## ● Algorithm: Depth-First Search (DFS)
+### Depth-First Search (DFS)
 
-### **Input**
+#### **Input**
 - `Matrix prob` → Initial puzzle configuration  
 - `Matrix sol` → Goal puzzle configuration  
 
-### **Output**
+#### **Output**
 - `"Success!"` if goal state is found  
 - `"Failed!"` if no solution exists  
 
-### **Pseudocode**
+#### **Pseudocode**
 ```
 FUNCTION dfs(prob, sol):
     s ← empty stack
@@ -147,40 +146,98 @@ FUNCTION dfs(prob, sol):
 
 ---
 
-### ● Sample Test Cases
-#### BFS:
-**Initial (Start) State:**
+### Best-First Search (Using Heuristics)
 
+#### **Idea**
+Best-First Search selects the next state to explore based on the **heuristic value** — an estimate of how close the current state is to the goal.  
+
+#### **Heuristic Function**
+The **Manhattan Distance** for a tile is the sum of the absolute differences between its current coordinates and its goal coordinates.  
+The total heuristic is the sum over all tiles (ignoring `0`).
+
+#### **Input**
+- `Matrix prob` → Initial puzzle configuration  
+- `Matrix goal` → Goal puzzle configuration  
+
+#### **Output**
+- `"Success!"` if goal state is found  
+- `"Failed!"` if no solution exists 
+#### **Pseudocode**
+```
+FUNCTION heuristic(state, goal):
+    pos ← dictionary storing positions of each number in goal
+    dist ← 0
+    FOR i in 0..2:
+        FOR j in 0..2:
+            val ← state[i][j]
+            IF val != 0:
+                dist += |i - pos[val].row| + |j - pos[val].col|
+    RETURN dist
+```
+
+```
+FUNCTION bestFirstSearch(prob, goal):
+    pq ← empty priority queue (min-heap by heuristic value)
+    closed ← empty set
+
+    CREATE Node with:
+        state = prob
+        h = heuristic(prob, goal)
+    INSERT Node into pq (ordered by h)
+
+    INSERT matrixToString(prob) into closed
+
+    WHILE pq is not empty:
+        cur ← REMOVE_TOP from pq
+
+        IF cur.state == goal:
+            PRINT "Success!"
+            RETURN
+
+        FOR each child in genmove(cur.state):
+            str ← matrixToString(child)
+            IF str not in closed:
+                INSERT str into closed
+                CREATE Node with:
+                    state = child
+                    h = heuristic(child, goal)
+                INSERT Node into pq (ordered by h)
+
+    PRINT "Failed!"
+```
+
+---
+
+## ● Sample Test Cases
+
+### BFS:
+**Initial State:**
 ```
 1 2 3
 4 0 6
 7 5 8
 ```
 
-**Goal (Solution) State:**
-
+**Goal State:**
 ```
 1 2 3
 4 5 6
 7 8 0
-
 ```
 **Output:**
 ```
 Success!
 ```
 
-#### DFS:
-**Initial (Start) State:**
-
+### DFS:
+**Initial State:**
 ```
 1 2 3
 4 5 6
 0 7 8
 ```
 
-**Goal (Solution) State:**
-
+**Goal State:**
 ```
 1 2 3
 4 5 6
@@ -191,21 +248,74 @@ Success!
 Success!
 ```
 
-### ● Use Cases
+### Best-First Search:
+**Initial State:**
+```
+1 2 3
+5 0 6
+4 7 8
+```
 
-- **AI Research & Teaching**: Introduces concepts of uninformed search, state space, and heuristics.
-- **Pathfinding**: Demonstrates basic BFS and DFS applications in graph traversal.
-- **Game Solvers**: Foundation for solving board-based problems (Sudoku, Rubik’s cube).
-- **Interview Preparation**: Common example in system design and AI interviews.
+**Goal State:**
+```
+1 2 3
+4 5 6
+7 8 0
+```
+**Output:**
+```
+Success!
+```
 
 ---
+
+### ● Use Cases
+
+- **Breadth-First Search (BFS)**  
+  - Finding the **shortest solution path** when all moves have equal cost (e.g., solving small puzzles, unweighted pathfinding).  
+  - Teaching **uninformed search algorithms** in AI courses due to its simplicity and completeness.  
+
+- **Depth-First Search (DFS)**  
+  - Exploring **deep solutions** where the path length isn’t important, and memory efficiency is needed.  
+  - Traversing **large state spaces** when only one valid solution is required without checking all possibilities.  
+
+- **Best-First Search (Greedy Search)**  
+  - Solving problems where a **heuristic estimate** can guide the search toward the goal efficiently (e.g., Manhattan distance in puzzles).  
+  - AI navigation and **robot path planning** where we want a quick, heuristic-driven solution rather than guaranteed optimality.  
+
+---
+
+### ● Limitations
+
+- **BFS**:  
+  - High **memory usage** in large search spaces.  
+  - Can be slow if the solution is deep.  
+
+- **DFS**:  
+  - **May get stuck** exploring a long or infinite branch.  
+  - Not guaranteed to find the shortest solution.  
+
+- **Best-First Search**:  
+  - Heuristic may **mislead** the search into suboptimal paths.  
+  - Not guaranteed to find the shortest path unless using A*.  
+
+---
+### ● Time and Space Complexities
+  - b → branching factor (max possible moves from a state; for 8-puzzle, b ≤ 4)
+  - d → depth of the goal state
+  - 
+| Algorithm            | Time Complexity                                       | Space Complexity |
+|----------------------|-------------------------------------------------------|------------------|
+| `BreadthFirstSearch` | O(b<sup>d</sup>)                                      | O(b·d)           |
+| `DepthFirstSearch`   | O(b<sup>d</sup>)                                      | O(b<sup>d</sup>) | 
+| `BestFirstSearch`    | O(b·log b × d) (average) to O(b<sup>d</sup>) (worst)  | O(b<sup>d</sup>) |
+
 
 ### ● Files
 
 | Filename                 | Description                                  |
 |--------------------------|----------------------------------------------|
-| `8_PUZZLE_BFS.cpp`       | BFS-based 8-puzzle solver                    |
-| `8_PUZZLE_DFS.cpp`       | DFS-based 8-puzzle solver                    |
+| `BreadthFirstSearch.cpp` | BFS-based 8-puzzle solver                    |
+| `DepthFirstSearch.cpp`   | DFS-based 8-puzzle solver                    |
+| `BestFirstSearch.cpp`    | Best-First Search 8-puzzle solver            |
 | `README.md`              | Explanation and documentation                |
-
-
