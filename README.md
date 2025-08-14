@@ -21,93 +21,129 @@ The **8-Puzzle Problem** is a classic problem in artificial intelligence and gra
 
 ---
 
-### ● Algorithm: Breadth-First Search (BFS) for 8-Puzzle Problem
+## ● Algorithm: Breadth-First Search (BFS)
 
-#### **Input**
-- `Matrix prob` → Initial puzzle configuration (`vector<vector<int>>`)
-- `Matrix sol` → Goal puzzle configuration (`vector<vector<int>>`)
+### **Input**
+- `Matrix prob` → Initial puzzle configuration  
+- `Matrix sol` → Goal puzzle configuration  
 
-#### **Output**
-- `"Success!"` if goal state is found
-- `"Failed!"` if no solution exists
+### **Output**
+- `"Success!"` if goal state is found  
+- `"Failed!"` if no solution exists  
+
+### **Pseudocode**
+```
+FUNCTION genmove(state):
+    nextStates ← empty list
+    FIND coordinates (a, b) where state[a][b] = 0
+
+    IF a > 0:
+        s ← copy of state
+        swap s[a][b] with s[a-1][b]
+        append s to nextStates
+
+    IF a < 2:
+        s ← copy of state
+        swap s[a][b] with s[a+1][b]
+        append s to nextStates
+
+    IF b > 0:
+        s ← copy of state
+        swap s[a][b] with s[a][b-1]
+        append s to nextStates
+
+    IF b < 2:
+        s ← copy of state
+        swap s[a][b] with s[a][b+1]
+        append s to nextStates
+
+    RETURN nextStates
+```
+
+```
+FUNCTION matrixToString(mat):
+    s ← empty string
+    FOR each row in mat:
+        FOR each value in row:
+            append value to s as a string
+    RETURN s
+```
+
+```
+FUNCTION bfs(prob, sol):
+    q ← empty queue
+    closed ← empty set
+
+    ENQUEUE prob into q
+    INSERT matrixToString(prob) into closed
+
+    WHILE q is not empty:
+        A ← DEQUEUE from q
+
+        IF A equals sol:
+            PRINT "Success!"
+            RETURN
+
+        states ← genmove(A)
+        FOR each state in states:
+            str ← matrixToString(state)
+            IF str not in closed:
+                INSERT str into closed
+                ENQUEUE state into q
+
+    PRINT "Failed!"
+```
+
+```
+MAIN:
+    prob ← [[1, 2, 3],
+            [4, 0, 6],
+            [7, 5, 8]]
+
+    sol  ← [[1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 0]]
+
+    CALL bfs(prob, sol)
+```
 
 ---
 
-#### **Step 1 – Initialize**
-1. Create a queue `q` to store puzzle states for exploration.  
-2. Create an unordered set `closed` to store visited states in string form. 
-3. Push the initial state `prob` into `q`.  
-4. Convert `prob` into a string using `matrixToString` and insert into `closed`.
+## ● Algorithm: Depth-First Search (DFS)
 
----
+### **Input**
+- `Matrix prob` → Initial puzzle configuration  
+- `Matrix sol` → Goal puzzle configuration  
 
-#### **Step 2 – BFS Loop**
-While `q` is **not empty**:  
-1. Remove the front state `A` from `q`.  
-2. **Goal Test:**  
-   - If `A` equals `sol`, print `"Success!"` and stop.  
-3. **Generate Moves:**  
-   - Find the position `(a, b)` of the blank tile (`0`).  
-   - Create new states by swapping the blank tile with:
-     - **Up** if `a > 0`  
-     - **Down** if `a < 2`  
-     - **Left** if `b > 0`  
-     - **Right** if `b < 2`  
-4. For each generated state:
-   - Convert the state to a string using `matrixToString`.  
-   - If not present in `closed`:
-     - Insert it into `closed`.  
-     - Push it into `q`.
+### **Output**
+- `"Success!"` if goal state is found  
+- `"Failed!"` if no solution exists  
 
----
+### **Pseudocode**
+```
+FUNCTION dfs(prob, sol):
+    s ← empty stack
+    closed ← empty set
 
-#### **Step 3 – Failure Case**
-If the queue becomes empty before finding the goal:  
-- Print `"Failed!"`.
+    PUSH prob into s
+    INSERT matrixToString(prob) into closed
 
+    WHILE s is not empty:
+        A ← POP from s
 
-### ● Algorithm: Depth-First Search (DFS) for 8-Puzzle Problem
+        IF A equals sol:
+            PRINT "Success!"
+            RETURN
 
-#### **Input**
-- `Matrix prob` → Initial puzzle configuration (`vector<vector<int>>`)
-- `Matrix sol` → Goal puzzle configuration (`vector<vector<int>>`)
+        states ← genmove(A)
+        FOR each state in states:
+            str ← matrixToString(state)
+            IF str not in closed:
+                INSERT str into closed
+                PUSH state into s
 
-#### **Output**
-- `"Success!"` if goal state is found
-- `"Failed!"` if no solution exists
-
-
-#### **Step 1 – Initialize**
-1. Create a stack `s` to store puzzle states for exploration.  
-2. Create an unordered set `closed` to store visited states in string form.  
-3. Push the initial state `prob` into `s`.  
-4. Convert `prob` into a string using `matrixToString` and insert into `closed`.
-
-
-
-#### **Step 2 – DFS Loop**
-While `s` is **not empty**:  
-1. Remove the top state `A` from `s`.  
-2. **Goal Test:**  
-   - If `A` equals `sol`, print `"Success!"` and stop.  
-3. **Generate Moves:**  
-   - Find the position `(a, b)` of the blank tile (`0`).  
-   - Create new states by swapping the blank tile with:
-     - **Up** if `a > 0`  
-     - **Down** if `a < 2`  
-     - **Left** if `b > 0`  
-     - **Right** if `b < 2`  
-4. For each generated state:
-   - Convert the state to a string using `matrixToString`.  
-   - If not present in `closed`:
-     - Insert it into `closed`.  
-     - Push it into `s`.
-
-
-#### **Step 3 – Failure Case**
-If the stack becomes empty before finding the goal:  
-- Print `"Failed!"`.
-
+    PRINT "Failed!"
+```
 
 ---
 
