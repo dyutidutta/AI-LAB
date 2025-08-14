@@ -1,19 +1,15 @@
+<h1 align="center">Artificial Intelligence</h1>
 
-# 8-Puzzle Problem using BFS and DFS in C++
+## Practical :- 8-Puzzle Problem using BFS and DFS in C++
 
-## Problem Statement
+### ● Problem Statement
 
-The **8-Puzzle Problem** is a classic problem in artificial intelligence and graph theory. It consists of a 3x3 grid with tiles numbered 1 through 8 and one empty space (represented as `0`). The goal is to move the tiles into the correct position by sliding them one at a time into the empty space, ultimately reaching a predefined goal state.
-
-## Objectives
-
-- Implement **Breadth-First Search (BFS)** to check if a solution exists by exploring states level by level.
-- Implement **Depth-First Search (DFS)** to determine if the goal state can be reached via depth exploration.
+The **8-Puzzle Problem** is a classic problem in artificial intelligence and graph theory. It consists of a 3x3 grid with tiles numbered 1-8 and one empty space (represented as `0`). The goal is to move the tiles into the correct position by sliding them one at a time into the empty space, ultimately reaching a predefined goal state.
 
 
 ---
 
-## Data Structures Used
+### ● Data Structures Used
 
 | Component         | Data Structure            | Purpose                                          |
 |-------------------|---------------------------|--------------------------------------------------|
@@ -25,143 +21,98 @@ The **8-Puzzle Problem** is a classic problem in artificial intelligence and gra
 
 ---
 
-## Algorithm: Breadth-First Search (BFS)
+### ● Algorithm: Breadth-First Search (BFS) for 8-Puzzle Problem
 
-```cpp
-void bfs(Matrix prob, Matrix sol)
-{
-    queue<Matrix> q;
-    unordered_set<string> closed;
+#### **Input**
+- `Matrix prob` → Initial puzzle configuration (`vector<vector<int>>`)
+- `Matrix sol` → Goal puzzle configuration (`vector<vector<int>>`)
 
-    q.push(prob);
-    closed.insert(matrixToString(prob));
-
-    while (!q.empty())
-    {
-        Matrix A = q.front();
-        q.pop();
-
-        if (A == sol)
-        {
-            cout << "Success!" << endl;
-            return;
-        }
-
-        list<Matrix> states = genmove(A);
-        for (auto state : states)
-        {
-            string str = matrixToString(state);
-            if (closed.find(str) == closed.end())
-            {
-                closed.insert(str);
-                q.push(state);
-            }
-        }
-    }
-
-    cout << "Failed!" << endl;
-}
-```
+#### **Output**
+- `"Success!"` if goal state is found
+- `"Failed!"` if no solution exists
 
 ---
 
-## Algorithm: Depth-First Search (DFS)
-
-```cpp
-void dfs(Matrix prob, Matrix sol)
-{
-    stack<Matrix> s;
-    unordered_set<string> closed;
-
-    s.push(prob);
-    closed.insert(matrixToString(prob));
-
-    while (!s.empty())
-    {
-        Matrix A = s.top();
-        s.pop();
-
-        if (A == sol)
-        {
-            cout << "Success!" << endl;
-            return;
-        }
-
-        list<Matrix> states = genmove(A);
-        for (auto state : states)
-        {
-            string str = matrixToString(state);
-            if (closed.find(str) == closed.end())
-            {
-                closed.insert(str);
-                s.push(state);
-            }
-        }
-    }
-
-    cout << "Failed!" << endl;
-}
-```
+#### **Step 1 – Initialize**
+1. Create a queue `q` to store puzzle states for exploration.  
+2. Create an unordered set `closed` to store visited states in string form. 
+3. Push the initial state `prob` into `q`.  
+4. Convert `prob` into a string using `matrixToString` and insert into `closed`.
 
 ---
 
-## State Generation
-
-```cpp
-list<Matrix> genmove(Matrix state)
-{
-    list<Matrix> nextStates;
-    int a, b;
-
-    // Locate blank space (0)
-    for (int i = 0; i < 3; ++i)
-        for (int j = 0; j < 3; ++j)
-            if (state[i][j] == 0)
-            {
-                a = i;
-                b = j;
-            }
-
-    // Try all 4 directions: up, down, left, right
-    if (a - 1 >= 0) { Matrix A1 = state; swap(A1[a][b], A1[a - 1][b]); nextStates.push_back(A1); }
-    if (a + 1 < 3) { Matrix A2 = state; swap(A2[a][b], A2[a + 1][b]); nextStates.push_back(A2); }
-    if (b - 1 >= 0) { Matrix A3 = state; swap(A3[a][b], A3[a][b - 1]); nextStates.push_back(A3); }
-    if (b + 1 < 3) { Matrix A4 = state; swap(A4[a][b], A4[a][b + 1]); nextStates.push_back(A4); }
-
-    return nextStates;
-}
-```
+#### **Step 2 – BFS Loop**
+While `q` is **not empty**:  
+1. Remove the front state `A` from `q`.  
+2. **Goal Test:**  
+   - If `A` equals `sol`, print `"Success!"` and stop.  
+3. **Generate Moves:**  
+   - Find the position `(a, b)` of the blank tile (`0`).  
+   - Create new states by swapping the blank tile with:
+     - **Up** if `a > 0`  
+     - **Down** if `a < 2`  
+     - **Left** if `b > 0`  
+     - **Right** if `b < 2`  
+4. For each generated state:
+   - Convert the state to a string using `matrixToString`.  
+   - If not present in `closed`:
+     - Insert it into `closed`.  
+     - Push it into `q`.
 
 ---
 
-## Utility Function
+#### **Step 3 – Failure Case**
+If the queue becomes empty before finding the goal:  
+- Print `"Failed!"`.
 
-```cpp
-string matrixToString(Matrix mat)
-{
-    string s;
-    for (auto row : mat)
-        for (int val : row)
-            s += to_string(val);
-    return s;
-}
-```
 
-Converts a 3x3 matrix into a flat string for hashing and lookup in `unordered_set`.
+### ● Algorithm: Depth-First Search (DFS) for 8-Puzzle Problem
+
+#### **Input**
+- `Matrix prob` → Initial puzzle configuration (`vector<vector<int>>`)
+- `Matrix sol` → Goal puzzle configuration (`vector<vector<int>>`)
+
+#### **Output**
+- `"Success!"` if goal state is found
+- `"Failed!"` if no solution exists
+
+
+#### **Step 1 – Initialize**
+1. Create a stack `s` to store puzzle states for exploration.  
+2. Create an unordered set `closed` to store visited states in string form.  
+3. Push the initial state `prob` into `s`.  
+4. Convert `prob` into a string using `matrixToString` and insert into `closed`.
+
+
+
+#### **Step 2 – DFS Loop**
+While `s` is **not empty**:  
+1. Remove the top state `A` from `s`.  
+2. **Goal Test:**  
+   - If `A` equals `sol`, print `"Success!"` and stop.  
+3. **Generate Moves:**  
+   - Find the position `(a, b)` of the blank tile (`0`).  
+   - Create new states by swapping the blank tile with:
+     - **Up** if `a > 0`  
+     - **Down** if `a < 2`  
+     - **Left** if `b > 0`  
+     - **Right** if `b < 2`  
+4. For each generated state:
+   - Convert the state to a string using `matrixToString`.  
+   - If not present in `closed`:
+     - Insert it into `closed`.  
+     - Push it into `s`.
+
+
+#### **Step 3 – Failure Case**
+If the stack becomes empty before finding the goal:  
+- Print `"Failed!"`.
+
 
 ---
 
-## Use Cases
-
-- **AI Research & Teaching**: Introduces concepts of uninformed search, state space, and heuristics.
-- **Pathfinding**: Demonstrates basic BFS and DFS applications in graph traversal.
-- **Game Solvers**: Foundation for solving board-based problems (Sudoku, Rubik’s cube).
-- **Interview Preparation**: Common example in system design and AI interviews.
-
----
-
-## Sample Outputs
-
+### ● Sample Test Cases
+#### BFS:
 **Initial (Start) State:**
 
 ```
@@ -176,12 +127,12 @@ Converts a 3x3 matrix into a flat string for hashing and lookup in `unordered_se
 1 2 3
 4 5 6
 7 8 0
-```
-### BFS Output:
-```
-Success!
-```
 
+```
+**Output:**
+Success!
+
+#### DFS:
 **Initial (Start) State:**
 
 ```
@@ -197,14 +148,21 @@ Success!
 4 5 6
 7 8 0
 ```
-### DFS Output:
+**Output:**
 ```
 Success!
 ```
 
+### ● Use Cases
 
+- **AI Research & Teaching**: Introduces concepts of uninformed search, state space, and heuristics.
+- **Pathfinding**: Demonstrates basic BFS and DFS applications in graph traversal.
+- **Game Solvers**: Foundation for solving board-based problems (Sudoku, Rubik’s cube).
+- **Interview Preparation**: Common example in system design and AI interviews.
 
-## Files
+---
+
+### ● Files
 
 | Filename                 | Description                                  |
 |--------------------------|----------------------------------------------|
