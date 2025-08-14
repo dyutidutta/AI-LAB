@@ -656,10 +656,10 @@ Both versions have **O(1)** time and **O(1)** space complexity since the board s
 
 ---
 ### ● Use Cases
-**Educational** : Demonstrates how to apply magic squares to a game logic problem.
-**Game AI Development:** Example of turn-based decision-making logic.
-**Problem Solving Practice:** Uses combinatorics and optimization.
-**Beginner Game Programming:** Introduces board representation, user input handling, and AI strategy.
+- **Educational** : Demonstrates how to apply magic squares to a game logic problem.
+- **Game AI Development:** Example of turn-based decision-making logic.
+- **Problem Solving Practice:** Uses combinatorics and optimization.
+- **Beginner Game Programming:** Introduces board representation, user input handling, and AI strategy.
 
 ---
 ### ● Files
