@@ -130,7 +130,9 @@ If the stack becomes empty before finding the goal:
 
 ```
 **Output:**
+```
 Success!
+```
 
 #### DFS:
 **Initial (Start) State:**
