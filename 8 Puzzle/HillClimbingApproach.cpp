@@ -1,113 +1,105 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
-#include <cmath>
-
+#include <unordered_set>
+#include <list>
 using namespace std;
 
-struct Puzzle {
-    vector<vector<int>> board;
-    int zero_row, zero_col;  
-    int heuristic;
+using Matrix = vector<vector<int>>;
 
-    int calculateHeuristic(const vector<vector<int>>& goal) {
-        int dist = 0;
-        for (int i = 0; i < 3; i++){
-            for (int j = 0; j < 3; j++){
-                int val = board[i][j];
-                if (val != 0) {
-                    for (int x = 0; x < 3; x++){
-                        for (int y = 0; y < 3; y++){
-                            if (goal[x][y] == val){
-                                dist += abs(i - x) + abs(j - y);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return dist;
-    }
-
-    vector<Puzzle> getNeighbors() {
-        vector<Puzzle> neighbors;
-        vector<pair<int,int>> moves = {{-1,0},{1,0},{0,-1},{0,1}}; 
-
-        for (auto m : moves) {
-            int new_r = zero_row + m.first;
-            int new_c = zero_col + m.second;
-            if (new_r >= 0 && new_r < 3 && new_c >= 0 && new_c < 3){
-                Puzzle next = *this;
-                swap(next.board[zero_row][zero_col], next.board[new_r][new_c]);
-                next.zero_row = new_r;
-                next.zero_col = new_c;
-                neighbors.push_back(next);
-            }
-        }
-        return neighbors;
-    }
-
-    bool isGoal(const vector<vector<int>>& goal) {
-        return board == goal;
-    }
+struct Node {
+    Matrix state;
+    int h;
 };
 
-Puzzle hillClimbing(Puzzle start, const vector<vector<int>>& goal) {
-    start.heuristic = start.calculateHeuristic(goal);
+list<Matrix> genmove(Matrix state) {
+    list<Matrix> nextStates;
+    int a,b;
+    for (int i=0; i<3; ++i)
+        for (int j=0; j<3; ++j)
+            if (state[i][j] == 0) { a=i; b=j; }
 
-    while (true) {
-        if (start.isGoal(goal)) {
-            return start;  
+    if (a > 0) { Matrix s = state; swap(s[a][b], s[a-1][b]); nextStates.push_back(s); }
+    if (a < 2) { Matrix s = state; swap(s[a][b], s[a+1][b]); nextStates.push_back(s); }
+    if (b > 0) { Matrix s = state; swap(s[a][b], s[a][b-1]); nextStates.push_back(s); }
+    if (b < 2) { Matrix s = state; swap(s[a][b], s[a][b+1]); nextStates.push_back(s); }
+
+    return nextStates;
+}
+
+string matrixToString(Matrix mat) {
+    string s;
+    for (auto &row : mat)
+        for (int val : row)
+            s += char('0' + val);
+    return s;
+}
+
+int heuristic(Matrix state, Matrix goal) {
+    int pos[9][2];
+    for (int i=0; i<3; ++i)
+        for (int j=0; j<3; ++j) {
+            pos[goal[i][j]][0] = i;
+            pos[goal[i][j]][1] = j;
         }
 
-        vector<Puzzle> neighbors = start.getNeighbors();
+    int dist = 0;
+    for (int i=0; i<3; ++i)
+        for (int j=0; j<3; ++j) {
+            int val = state[i][j];
+            if (val != 0) {
+                dist += abs(i - pos[val][0]) + abs(j - pos[val][1]);
+            }
+        }
+    return dist;
+}
 
-        Puzzle next_state = start;
-        int min_heuristic = start.heuristic;
+void hillClimbing(Matrix prob, Matrix goal) {
+    Node cur = {prob, heuristic(prob, goal)};
+    unordered_set<string> visited;
+    visited.insert(matrixToString(cur.state));
 
-        for (Puzzle &n : neighbors) {
-            n.heuristic = n.calculateHeuristic(goal);
-            if (n.heuristic < min_heuristic) {
-                min_heuristic = n.heuristic;
-                next_state = n;
+    while (true) {
+        if (cur.state == goal) {
+            cout << "Success!" << endl;
+            return;
+        }
+
+        auto neighbors = genmove(cur.state);
+
+        Node best = cur;
+        for (auto &n : neighbors) {
+            string nStr = matrixToString(n);
+            if (visited.find(nStr) != visited.end()) continue; 
+
+            int h = heuristic(n, goal);
+            if (h < best.h) {
+                best = {n, h};
             }
         }
 
-        if (min_heuristic >= start.heuristic) {
-            return start;
+        if (best.h >= cur.h) {
+            cout << "Stuck at local minimum or plateau!" << endl;
+            //Local minimum: All neighbors have a worse heuristic value (higher cost), but you haven’t reached the goal.
+            //Plateau: All neighbors have the same heuristic value, so there’s no clear better move.
+            return;
         }
 
-        start = next_state;
+        cur = best;
+        visited.insert(matrixToString(cur.state));
     }
 }
 
 int main() {
-    Puzzle start = {
-        {{1, 2, 3},
-        {4, 0, 6},
-        {7, 5, 8}},
-        1, 1, 0  
+    Matrix prob = {
+        {1,2,3},
+        {5,0,6},
+        {4,7,8}
     };
-
-    vector<vector<int>> goal = {
-        {1, 2, 3},
-        {4, 5, 6},
-        {7, 8, 0}
+    Matrix goal = {
+        {1,2,3},
+        {4,5,6},
+        {7,8,0}
     };
-
-    Puzzle result = hillClimbing(start, goal);
-
-    cout << "Result board after hill climbing:\n";
-    for (auto &row : result.board) {
-        for (int val : row) cout << val << " ";
-        cout << "\n";
-    }
-
-    if (result.isGoal(goal)) {
-        cout << "Goal reached!\n";
-    } else {
-        cout << "Stopped at local maxima, goal not reached.\n";
-    }
-
+    hillClimbing(prob, goal);
     return 0;
 }
